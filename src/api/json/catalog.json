@@ -2599,6 +2599,16 @@
         "*.comet.yml"
       ],
       "url": "https://json.schemastore.org/comet"
+    },
+    {
+      "name": "Architect Component",
+      "description": "Schema description",
+      "fileMatch": [
+        "architect.yml",
+        "architect.yaml",
+        "architect.json"
+      ],
+      "url": "http://json.schemastore.org/architect-component-v1.json"
     }
   ]
 }

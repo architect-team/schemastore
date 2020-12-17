@@ -1,0 +1,238 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "definitions": {
+        "ResourceSpecV1": {
+            "properties": {
+                "build": {
+                    "description": "Specify settings for the component that apply only at build-time.\n\nWhen registering a component with build settings, Architect will build the container, publish it to a registry, and replace the build settings with the new image reference before completing registration.",
+                    "properties": {
+                        "context": {
+                            "description": "The path to the source context to mount to the container. Must be relative to this configuration file.",
+                            "type": "string"
+                        },
+                        "dockerfile": {
+                            "default": "Dockerfile",
+                            "description": "A path to a Dockerfile that describes how the image should be built.",
+                            "type": "string"
+                        }
+                    },
+                    "type": "object"
+                },
+                "command": {
+                    "anyOf": [
+                        {
+                            "items": {
+                                "type": "string"
+                            },
+                            "type": "array"
+                        },
+                        {
+                            "type": "string"
+                        }
+                    ],
+                    "description": "A command to be used to start up the service inside the container. If no value is specified, the default CMD from the associated image will be used."
+                },
+                "cpu": {
+                    "description": "The number of vCPUs that should be allocated to each instance of this runtime.",
+                    "type": "number"
+                },
+                "entrypoint": {
+                    "anyOf": [
+                        {
+                            "items": {
+                                "type": "string"
+                            },
+                            "type": "array"
+                        },
+                        {
+                            "type": "string"
+                        }
+                    ],
+                    "description": "An entrypoint to be used to start up the service inside the container. If no value is specified, the default ENTRYPOINT from the associated image will be used."
+                },
+                "environment": {
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "description": "A key/value dictionary of environment parameters to apply to this runtime.",
+                    "type": "object"
+                },
+                "image": {
+                    "description": "Name and location of a docker image that powers this runtime. This field cannot be used in conjunction with the `build` field.",
+                    "type": "string"
+                },
+                "memory": {
+                    "description": "The target amount of memory to allocate for each instance of this runtime. Valid values includes things like 0.5GB, 2GB, 8GB, etc.",
+                    "type": "string"
+                },
+                "volumes": {
+                    "additionalProperties": {
+                        "anyOf": [
+                            {
+                                "properties": {
+                                    "description": {
+                                        "description": "A human-readable description of the volume and what kind of data gets stored on it",
+                                        "type": "string"
+                                    },
+                                    "host_path": {
+                                        "description": "The path on the host OS that should be mounted to the container OS. (Note: this is primarily used for application debugging)",
+                                        "type": "string"
+                                    },
+                                    "mount_path": {
+                                        "description": "A path inside the container OS that the volume should mount to",
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            },
+                            {
+                                "type": "string"
+                            }
+                        ]
+                    },
+                    "description": "A set of named volumes that the service will request and mount to each service instance.\n\nVolumes can either be an object describing the volume or a string shorthand that maps to the `mount_path` value.",
+                    "type": "object"
+                }
+            },
+            "type": "object"
+        }
+    },
+    "properties": {
+        "description": {
+            "description": "A human-readable description of the component and what it should be used for",
+            "type": "string"
+        },
+        "interfaces": {
+            "additionalProperties": {
+                "anyOf": [
+                    {
+                        "properties": {
+                            "description": {
+                                "description": "A human-readable description of the interface and how it should be used.",
+                                "type": "string"
+                            },
+                            "url": {
+                                "description": "The url of the downstream interfaces that should be exposed. This will usually be a reference to one of your services interfaces.",
+                                "type": "string"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    {
+                        "type": "string"
+                    }
+                ]
+            },
+            "description": "A dictionary of named interfaces that the component makes available to upstreams, including other components via dependencies or environments via interface mapping.\n\nInterfaces can either be an object describing the interface, or a string shorthand that directly applies to the `url` value.",
+            "type": "object"
+        },
+        "keywords": {
+            "description": "An array of keywords that can be used to index the component and make it discoverable for others",
+            "items": {
+                "type": "string"
+            },
+            "type": "array"
+        },
+        "name": {
+            "description": "Unique name of the component. Must be of the format, <account-name>/<component-name>",
+            "type": "string"
+        },
+        "parameters": {
+            "additionalProperties": {
+                "anyOf": [
+                    {
+                        "properties": {
+                            "default": {
+                                "description": "The default value to apply to the parameter when one wasn't provided by the operator",
+                                "type": "string"
+                            },
+                            "description": {
+                                "description": "A human-readable description of the parameter, how it should be used, and what kinds of values it supports.",
+                                "type": "string"
+                            },
+                            "required": {
+                                "default": false,
+                                "description": "A boolean indicating whether or not an operator is required ot provide a value",
+                                "type": "boolean"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    {
+                        "type": "string"
+                    }
+                ]
+            },
+            "description": "A dictionary of named parameters that this component uses to configure services.\n\nParameters can either be an object describing the parameter or a string shorthand that directly applies to the `default` value.",
+            "type": "object"
+        },
+        "services": {
+            "additionalProperties": {
+                "allOf": [
+                    {
+                        "$ref": "#/definitions/ResourceSpecV1"
+                    },
+                    {
+                        "properties": {
+                            "interfaces": {
+                                "additionalProperties": {
+                                    "anyOf": [
+                                        {
+                                            "properties": {
+                                                "host": {
+                                                    "description": "A fixed host address that represents an existing location for the service. Using this field will make this service 'virtual' and will not trigger provisioning.",
+                                                    "type": "string"
+                                                },
+                                                "port": {
+                                                    "description": "The port that the service is listening for requests on",
+                                                    "minimum": 1,
+                                                    "type": "number"
+                                                },
+                                                "protocol": {
+                                                    "default": "http",
+                                                    "description": "The protocol that the interface responds to",
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        {
+                                            "type": "number"
+                                        }
+                                    ]
+                                },
+                                "description": "A set of name interfaces that the service listens for traffic on. Interface definitions consist of either an object or a numerical shorthand that directly applies to the `port` field.",
+                                "type": "object"
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
+            "description": "A set of named services that need to be run and persisted in order to power this component.",
+            "type": "object"
+        },
+        "tasks": {
+            "additionalProperties": {
+                "allOf": [
+                    {
+                        "$ref": "#/definitions/ResourceSpecV1"
+                    },
+                    {
+                        "properties": {
+                            "schedule": {
+                                "description": "A cron string indicating the schedule at which the task will run. Architect will ensure the cron jobs are instrumented correctly regardless of where the task is deployed.",
+                                "type": "string"
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
+            "description": "A set of scheduled and triggerable tasks that get registered alongside the component. Tasks are great for data translation, reporting, and much more.",
+            "type": "object"
+        }
+    },
+    "type": "object"
+}
+

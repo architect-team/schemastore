@@ -1,0 +1,36 @@
+{
+  "name": "examples/component",
+  "description": "Description of a component",
+  "keywords": ["array", "of", "keywords"],
+  "parameters": {
+    "PARAM_A": {
+      "default": "value",
+      "required": true,
+      "description": "Parameter description"
+    },
+    "PARAM_B": {
+      "default": "value2"
+    },
+    "PARAM_C": "shorthand_value"
+  },
+  "tasks": {
+    "build": {
+      "context": "./path",
+      "dockerfile": "Dockerfile"
+    },
+    "environment": {
+      "KEY": "VALUE"
+    },
+    "interfaces": {
+      "first": 8080,
+      "second": {
+        "port": 5432,
+        "protocol": "postgres"
+      },
+      "third": {
+        "port": 8081,
+        "host": "external.host"
+      }
+    }
+  }
+}
